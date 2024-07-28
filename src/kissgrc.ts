@@ -16,9 +16,12 @@ export interface kissgrc {
         sourceDirectory: string;
         htmlTemplate: string;
     }
+    index: {
+        enable: boolean;
+        listItemTemplate: string;
+        htmlTemplate: string;
+    }
     output: {
         outputDirectory: string;
-        buildIndex: boolean;
-        indexTitle: string;
     }
 }

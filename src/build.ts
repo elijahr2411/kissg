@@ -51,6 +51,7 @@ async function buildFile(project: KissgProject, source: string, dest: string): P
             console.error(`Failed to parse kissg header from ${source}: ${(e as Error).message}`);
             process.exit(1);
         }
+        kissgHeaderEnd += 8;
     } else {
         kissgHeader = {};
         kissgHeaderEnd = 0;
@@ -70,8 +71,8 @@ async function buildFile(project: KissgProject, source: string, dest: string): P
     });
     // Write the output file
     await writeFile(dest, html);
-    // If date is not defined in the header, use the date the file was last modified
-    let date = kissgHeader.date ? new Date(kissgHeader.date) : (await stat(source)).mtime;
+    // If date is not defined in the header, use the date the file was created
+    let date = kissgHeader.date ? new Date(kissgHeader.date) : (await stat(source)).ctime;
     return {
         title,
         path: dest,
@@ -88,14 +89,14 @@ async function buildRecursive(project: KissgProject, srcdir?: string | undefined
     let counter = 0;
     let outfiles = [];
     if (srcdir === undefined) {
-        srcdir = project.getSrcDir();
+        srcdir = project.getRc().source.sourceDirectory;
     }
     let contents = await readdir(srcdir, {withFileTypes: true});
     let files = contents.filter(f => f.isFile() && f.name.endsWith('.md'));
     let dirs = contents.filter(f => f.isDirectory());
     // Build all files in the source directory
-    let relativeDir = path.relative(project.getSrcDir(), srcdir);
-    let destDir = path.join(project.getDestDir(), relativeDir);
+    let relativeDir = path.relative(project.getRc().source.sourceDirectory, srcdir);
+    let destDir = path.join(project.getRc().output.outputDirectory, relativeDir);
     await mkdir(destDir, { recursive: true });
     for (let file of files) {
         let src = path.join(srcdir, file.name);
@@ -118,16 +119,17 @@ async function buildRecursive(project: KissgProject, srcdir?: string | undefined
 async function buildIndex(project: KissgProject, pages: kissgPage[]) {
     // Sort pages by date (newest first)
     pages.sort((a, b) => b.date.getTime() - a.date.getTime());
-    let template = await project.getTemplate();
-    let title = project.getIndexTitle();
+    let template = await project.getIndexTemplate();
     let content = `<ul>${
-        pages.map(page => `<li><a href="${page.path}">${page.title}</a></li>`).join('')
+        pages.map(page => doTemplate(project.getRc().index.listItemTemplate, {
+            title: page.title,
+            url: path.relative(project.getRc().output.outputDirectory, page.path)
+        })).join('')
     }</ul>`;
     let html = doTemplate(template, {
-        title,
         content
     });
-    let dest = path.join(project.getDestDir(), 'index.html');
+    let dest = path.join(project.getRc().output.outputDirectory, 'index.html');
     await writeFile(dest, html);
 }
 
@@ -135,7 +137,7 @@ export async function Build(argv: string[], project: KissgProject) {
     let cmdline = cli(BuildArgs, { argv });
     let res = await buildRecursive(project);
     console.log(`Built ${res.count} files`);
-    if (project.buildIndex()) {
+    if (project.getRc().index.enable) {
         await buildIndex(project, res.pages);
         console.log(`Built index page`);
     }

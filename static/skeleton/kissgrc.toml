@@ -7,7 +7,11 @@ htmlTemplate = "./template.html"
 [output]
 # Directory to place compiled HTML files
 outputDirectory = "./dist"
+
+[index]
 # True if you want kissg to build an index.html containing a list of all pages
-buildIndex = true
-# Title to use for the index page
-indexTitle = "Index"
+enable = true
+# Path to an HTML template file
+htmlTemplate = "./index.html"
+# Template for each item in the index
+listItemTemplate = """<li><a href="{{ url }}">{{ title }}</a></li>"""

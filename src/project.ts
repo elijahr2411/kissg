@@ -37,20 +37,12 @@ export class KissgProject {
         return new KissgProject(rc, project);
     }
 
-    getDestDir() {
-        return path.join(this.dir, this.rc.output.outputDirectory);
+    getRc() {
+        return structuredClone(this.rc);
     }
 
-    getSrcDir() {
-        return path.join(this.dir, this.rc.source.sourceDirectory);
-    }
-
-    buildIndex() {
-        return this.rc.output.buildIndex;   
-    }
-
-    getIndexTitle() {
-        return this.rc.output.indexTitle;
+    async getIndexTemplate() {
+        return await readFile(path.join(this.dir, this.rc.index.htmlTemplate), 'utf8');
     }
 
     async getTemplate() {
