@@ -1,0 +1,9 @@
+Usage: kissg [global options] <command> [command options]
+
+Available commands:
+
+    build: Build the current project
+    help: Show this message
+
+Global options:
+    --project, -p: Set the project for kissg to use. Defaults to current working directory.

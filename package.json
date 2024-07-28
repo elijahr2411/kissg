@@ -1,0 +1,20 @@
+{
+  "name": "kissg",
+  "packageManager": "yarn@4.2.2",
+  "bin": "./dist/index.js",
+  "devDependencies": {
+    "@types/command-line-args": "^5.2.3",
+    "@types/node": "^22.0.0",
+    "@types/remarkable": "^2",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "prepack": "node build.js"
+  },
+  "dependencies": {
+    "command-line-args": "^6.0.0",
+    "remarkable": "^2.0.1",
+    "toml": "^3.0.0"
+  }
+}
