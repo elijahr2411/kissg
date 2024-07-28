@@ -16,5 +16,6 @@
     "command-line-args": "^6.0.0",
     "remarkable": "^2.0.1",
     "toml": "^3.0.0"
-  }
+  },
+  "license": "GPL-3.0-or-later"
 }
